@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f5f5ef"><meta name="description" content="把任意图片写成文字，用指尖泛起涟漪。支持本地图片和水波参数调节。"><title>纸上涟漪 · Paper Ripples</title><style>
+:root{font-family:system-ui,-apple-system,"PingFang SC",sans-serif;color:#343b31;background:#f5f5ef;color-scheme:light}*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0}main{max-width:1540px;margin:auto;padding:32px 32px 24px}header{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:24px}.eyebrow{font:10px monospace;letter-spacing:.18em;color:#808775;margin:0 0 10px}h1{font-size:27px;font-weight:500;letter-spacing:.12em;margin:0}h1 span{font:italic 19px Georgia,serif;color:#858c79;letter-spacing:0;margin-left:16px}.intro{font-size:12px;color:#7c8472;margin:12px 0 0;line-height:1.8}button{border:1px solid #ced3c4;background:transparent;border-radius:24px;padding:10px 17px;color:#46543a;font-size:12px;cursor:pointer;white-space:nowrap}button:hover{background:#e8ecdf}button.primary{background:#43553e;border-color:#43553e;color:#fff}button.primary:hover{background:#35472f}button:disabled{opacity:.35;cursor:default}button[aria-pressed=true]{background:#e3eadb}button:focus-visible,input:focus-visible{outline:2px solid #60764d;outline-offset:4px}.canvas-meta{display:flex;justify-content:space-between;align-items:center;font-size:10px;color:#929a88;gap:16px;margin-bottom:10px}#filename{max-width:70%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#stage{position:relative;aspect-ratio:1400/788;background:#fdfdfb;border:1px solid #dce0d3;overflow:hidden;box-shadow:0 14px 50px #343b2007;isolation:isolate}canvas{width:100%;height:100%;display:block;touch-action:none;cursor:default}canvas:focus-visible{outline:2px solid #73855e;outline-offset:-3px}#empty{position:absolute;inset:24px;border:1px dashed #d5dcca;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:20px;gap:12px}.watermark{font:italic 60px Georgia,serif;color:#a9b59a;line-height:1;margin:0 0 2px;letter-spacing:-.15em;padding-right:12px}.empty-title{font-size:18px;font-weight:400;margin:0;letter-spacing:.08em}.empty-note{color:#8a927f;font-size:11px;line-height:1.9;margin:0}.or{font:10px monospace;color:#a1a994;letter-spacing:.2em}#loading,#drop-mask{position:absolute;inset:0;background:#fafbf5ee;display:grid;place-content:center;text-align:center;color:#647450;font-size:15px;z-index:3;pointer-events:none}#drop-mask{display:none;border:2px dashed #8da578;background:#f0f5e8f2}.dragging #drop-mask{display:grid}.panel{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:30px;align-items:center;padding:22px 0;border-bottom:1px solid #dfe3d7}.parameter label{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#526046;margin-bottom:12px}.parameter output{font:12px monospace;color:#7c8b6c}.parameter input{display:block;width:100%;height:4px;accent-color:#667b51;cursor:pointer;margin:10px 0}.parameter small{display:block;color:#949c89;font-size:10px;margin-top:10px}.actions{grid-column:1/-1;display:flex;gap:7px;flex-wrap:wrap;justify-content:end}footer{display:flex;justify-content:space-between;gap:20px;align-items:start;padding-top:16px}.hint{font-size:11px;color:#8a9380;line-height:1.8;margin:0}.hint strong{font-weight:500;color:#657457}#status{font-size:11px;line-height:1.8;min-height:20px;color:#6c7f56;text-align:right;margin:0}#stage:fullscreen{background:#fafaf7;display:flex;align-items:center;justify-content:center;border:0}#stage:fullscreen canvas{width:min(100vw,calc(100vh * 1400 / 788));height:auto}@media(max-width:850px){main{padding:22px 15px}.panel{grid-template-columns:1fr;gap:20px}.actions{grid-column:1/-1;justify-content:start}h1{font-size:23px}h1 span{font-size:16px;margin-left:10px}header{align-items:start}#empty{inset:12px;gap:7px}.watermark{font-size:42px}.empty-title{font-size:15px}.empty-note{font-size:10px}.intro{max-width:340px}footer{flex-direction:column;gap:8px}#status{text-align:left}}@media(max-width:500px){main{padding:20px 12px}h1 span{display:block;margin:7px 0 0;font-size:16px}header{margin-bottom:20px}.intro{font-size:11px}#stage{aspect-ratio:1400/788;min-height:230px}canvas{position:absolute;width:100%;height:auto;top:50%;transform:translateY(-50%)}.watermark,.or{display:none}.empty-title{font-size:15px}.empty-note{max-width:210px}#empty{gap:12px}.panel{gap:18px}.actions button{padding:9px 12px;font-size:11px}}
+</style></head><body><main><header><div><p class="eyebrow">A SMALL EXPERIMENT IN TYPE & WATER</p><h1>纸上涟漪 <span>Paper Ripples</span></h1><p class="intro">保留每一抹原色，让文字轻轻泛起涟漪。</p></div><button class="primary" id="upload">＋ 选择 / 更换图片</button></header><div class="canvas-meta"><span id="filename">等待一张图片</span><span>LOCAL IMAGE · LIVE RIPPLE</span></div><section id="stage" aria-label="图片上传与文字涟漪画布" aria-busy="false"><canvas id="art" tabindex="-1" hidden aria-label="文字图片。任意点击产生水波纹，按住或拖动连续激起涟漪；聚焦后可按空格体验。"></canvas><div id="empty"><p class="watermark" aria-hidden="true">≈</p><h2 class="empty-title">把一张图片，写成彩色涟漪</h2><p class="empty-note">拖拽图片到这里，或从本地选择<br>JPG / PNG / WebP 等浏览器支持的图片 · 最大 40 MB</p><span class="or">— OR —</span><button id="choose" class="primary">选择本地图片</button><p class="empty-note">按原图取色 · 图片仅在你的浏览器中处理</p></div><div id="loading" hidden role="status">正在把图片写进文字里…</div><div id="drop-mask">松开图片，让涟漪开始</div></section><input id="file" type="file" accept="image/*" hidden><section class="panel" aria-label="波纹调节"><div class="parameter"><label for="size">波纹大小 <output id="size-value" for="size">1.0×</output></label><input type="range" id="size" min="0.5" max="2" step="0.1" value="1" aria-label="波纹大小"><small>细小涟漪 ↔ 大范围扩散</small></div><div class="parameter"><label for="frequency">波纹频率 <output id="frequency-value" for="frequency">3.0 次 / 秒</output></label><input type="range" id="frequency" min="0.5" max="6" step="0.5" value="3" aria-label="波纹频率"><small>调节按住、拖动和自动演示的出波频率</small></div><div class="parameter"><label for="type-size">字母大小 <output id="type-size-value" for="type-size">9.5 px</output></label><input type="range" id="type-size" min="6" max="20" step="0.5" value="9.5" aria-label="字母大小"><small>细密细节 ↔ 鲜明文字感</small></div><div class="parameter"><label for="sway">摇晃幅度 <output id="sway-value" for="sway">42 px</output></label><input type="range" id="sway" min="0" max="80" step="2" value="42" aria-label="摇晃幅度"><small>平静 ↔ 像浸在水中一样摇晃</small></div><div class="actions"><button id="motion" aria-pressed="true" disabled>水中摇晃：开</button><button id="demo" aria-pressed="false" disabled>自动演示</button><button id="reset" disabled>平息波纹</button><button id="save" disabled>保存画面</button><button id="full" disabled>全屏</button><button id="clear" disabled>清空</button></div></section><footer><p class="hint"><strong>点击</strong> 激起水波　·　<strong>按住拖动</strong> 涟漪交叠　·　<strong>松开</strong> 自然平息</p><p id="status" role="status" aria-live="polite">从一张喜欢的图片开始。</p></footer></main><script>
+
+'use strict';
+const canvas=document.getElementById('art'),ctx=canvas.getContext('2d',{alpha:false}),stage=document.getElementById('stage');
+const W=1400,H=788,loading=document.getElementById('loading'),status=document.getElementById('status');
+canvas.width=W;canvas.height=H;
+const prose='An image becomes a page, a page becomes a quiet sea. Every letter holds a little light. Touch anywhere and ripples travel through the words. They meet, they drift, they fade. Let go and every letter finds its way home. A moment on paper, a memory in water. ';
+const letters=[],waves=[],touches=new Map();let ready=false,time=0,last=0,auto=false,nextDemo=0,demoIndex=0,keyHeld=false,keyEmit=0,waveSize=1,waveRate=3,loadVersion=0,dragDepth=0,fontSize=9.5,currentImage=null,fontTimer=0,ambient=!window.matchMedia("(prefers-reduced-motion: reduce)").matches,ambientBlend=0,swayAmount=42,swayCurrent=42;
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+// Cache each glyph in its exact sampled RGB color; no grayscale or palette reduction.
+let cellW=16,cellH=20,atlasPages=[],glyphCache=new Map();
+function buildAtlas(){cellW=Math.ceil(fontSize*1.1)+4;cellH=Math.ceil(fontSize*1.7)+4;atlasPages=[];glyphCache=new Map()}
+function coloredGlyph(ch,color){const key=ch+color;if(glyphCache.has(key))return glyphCache.get(key);
+const cols=Math.floor(2048/cellW),rows=Math.floor(2048/cellH),capacity=cols*rows,index=glyphCache.size,page=Math.floor(index/capacity),slot=index%capacity;
+if(!atlasPages[page]){const sheet=document.createElement('canvas');sheet.width=2048;sheet.height=2048;const painter=sheet.getContext('2d');painter.font=fontSize+'px monospace';painter.textAlign='center';painter.textBaseline='middle';atlasPages.push({sheet,painter})}
+const sx=(slot%cols)*cellW,sy=Math.floor(slot/cols)*cellH,painter=atlasPages[page].painter;painter.fillStyle=color;painter.fillText(ch,sx+cellW/2,sy+cellH/2);
+const sprite={page,sx,sy};glyphCache.set(key,sprite);return sprite}
+buildAtlas();
+function initialize(image){
+const sample=document.createElement('canvas');sample.width=W;sample.height=H;
+const sc=sample.getContext('2d',{willReadFrequently:true});sc.fillStyle='#fff';sc.fillRect(0,0,W,H);
+const iw=image.naturalWidth,ih=image.naturalHeight,fit=Math.min((W-20)/iw,(H-20)/ih),dw=iw*fit,dh=ih*fit,left=(W-dw)/2,top=(H-dh)/2;
+sc.drawImage(image,left,top,dw,dh);const data=sc.getImageData(0,0,W,H).data;
+function lum(x,y){const i=(clamp(Math.round(y),0,H-1)*W+clamp(Math.round(x),0,W-1))*4;return (data[i]*.2126+data[i+1]*.7152+data[i+2]*.0722)/255}
+const next=[];let index=0;buildAtlas();
+for(let y=top+4;y<top+dh-3;y+=fontSize*1.035)for(let x=left+3;x<left+dw-3;x+=fontSize*.62){const ch=prose[index++%prose.length];if(ch===' ')continue;
+const l=lum(x,y),gx=lum(x+7,y)-lum(x-7,y),gy=lum(x,y+7)-lum(x,y-7),bend=Math.sin(Math.PI*y/H),hx=x+clamp(gx*22,-6,6)*bend,hy=y+((l-.5)*10+clamp(gy*20,-5,5))*bend;
+const pixel=(clamp(Math.round(y),0,H-1)*W+clamp(Math.round(x),0,W-1))*4;
+const color='rgb('+data[pixel]+','+data[pixel+1]+','+data[pixel+2]+')';
+next.push({hx,hy,x:hx,y:hy,vx:0,vy:0,color,...coloredGlyph(ch,color)})}
+
+reset();letters.length=0;letters.push(...next);ready=true;currentImage=image;canvas.hidden=false;canvas.tabIndex=0;
+document.getElementById('empty').hidden=true;setButtons(true);render();
+}
+function setButtons(enabled){for(const id of ['demo','reset','save','clear','full','motion'])document.getElementById(id).disabled=!enabled}
+async function loadFile(file){
+if(!file)return;
+if(!file.type.startsWith('image/')&&!/\.(png|jpe?g|webp|gif|avif|bmp|svg|ico)$/i.test(file.name)){status.textContent='请选择图片文件，例如 JPG、PNG 或 WebP。';return}
+if(file.size>40*1024*1024){status.textContent='这张图片超过 40 MB，请先缩小后再试。';return}
+const version=++loadVersion;cancelTouches();stopDemo();loading.hidden=false;loading.textContent='正在把图片写进文字里…';stage.setAttribute('aria-busy','true');
+const url=URL.createObjectURL(file),image=new Image();
+try{await new Promise((resolve,reject)=>{image.onload=resolve;image.onerror=reject;image.src=url});if(version!==loadVersion)return;
+if(!image.naturalWidth||!image.naturalHeight)throw new Error('Empty image');
+initialize(image);document.getElementById('filename').textContent=file.name+' · '+image.naturalWidth+' × '+image.naturalHeight;
+status.textContent='原图颜色已保留。点按或拖动，让彩色字母泛起涟漪。';
+}catch(error){if(version===loadVersion)status.textContent='无法读取这张图片，请换成 JPG、PNG 或 WebP 后重试。已有画面会保留。';
+}finally{URL.revokeObjectURL(url);if(version===loadVersion){loading.hidden=true;stage.setAttribute('aria-busy','false')}}}
+const fileInput=document.getElementById('file');
+for(const id of ['upload','choose'])document.getElementById(id).onclick=()=>fileInput.click();
+fileInput.addEventListener('change',()=>{loadFile(fileInput.files[0]);fileInput.value=''});
+function hasFile(e){return Array.from(e.dataTransfer?.types||[]).includes('Files')}
+stage.addEventListener('dragenter',e=>{if(hasFile(e)){e.preventDefault();dragDepth++;stage.classList.add('dragging')}});
+stage.addEventListener('dragover',e=>{if(hasFile(e)){e.preventDefault();e.dataTransfer.dropEffect='copy'}});
+stage.addEventListener('dragleave',e=>{if(dragDepth>0&&--dragDepth===0)stage.classList.remove('dragging')});
+stage.addEventListener('drop',e=>{e.preventDefault();dragDepth=0;stage.classList.remove('dragging');const files=e.dataTransfer.files;if(files.length)loadFile(files[0])});
+window.addEventListener('dragover',e=>{if(hasFile(e))e.preventDefault()});window.addEventListener('drop',e=>{if(hasFile(e))e.preventDefault()});
+document.getElementById('clear').onclick=()=>{loadVersion++;clearTimeout(fontTimer);currentImage=null;reset();letters.length=0;ready=false;setButtons(false);canvas.hidden=true;canvas.tabIndex=-1;document.getElementById('empty').hidden=false;loading.hidden=true;stage.setAttribute('aria-busy','false');document.getElementById('filename').textContent='等待一张图片';status.textContent='画布已清空，可以放入另一张图片。';render()};
+function syncControls(){waveSize=Number(document.getElementById('size').value);waveRate=Number(document.getElementById('frequency').value);document.getElementById('size-value').textContent=waveSize.toFixed(1)+'×';document.getElementById('frequency-value').textContent=waveRate.toFixed(1)+' 次 / 秒'}
+for(const id of ['size','frequency'])document.getElementById(id).addEventListener('input',syncControls);
+syncControls();
+document.getElementById('type-size').addEventListener('input',e=>{fontSize=Number(e.target.value);document.getElementById('type-size-value').textContent=fontSize.toFixed(1)+' px';clearTimeout(fontTimer);fontTimer=setTimeout(()=>{if(currentImage){initialize(currentImage);status.textContent='字母大小已更新，可以继续点按产生涟漪。'}else buildAtlas()},100)});
+// Each source produces only radial displacement. No angular motion or empty core.
+function addWave(x,y,strength=1){if(waves.length>=24)waves.shift();waves.push({x,y,born:time,strength,size:waveSize})}
+function stopDemo(){auto=false;document.getElementById('demo').setAttribute('aria-pressed','false');document.getElementById('demo').textContent='自动演示'}
+function reset(){stopDemo();touches.clear();keyHeld=false;waves.length=0;for(const p of letters){p.x=p.hx;p.y=p.hy;p.vx=p.vy=0}status.textContent='画面已平静，随意点一点'}
+function step(dt){time+=dt;if(!ready)return;ambientBlend+=((ambient?1:0)-ambientBlend)*(1-Math.exp(-dt*2.5));swayCurrent+=(swayAmount-swayCurrent)*(1-Math.exp(-dt*3));
+if(auto&&time>=nextDemo){const places=[[.32,.4],[.65,.52],[.48,.3],[.55,.66]];const point=places[demoIndex++%places.length];addWave(W*point[0],H*point[1]);nextDemo=time+1/waveRate}
+for(const touch of touches.values()){if(time-touch.emitted>=1/waveRate){addWave(touch.x,touch.y,.8);touch.emitted=time;touch.ex=touch.x;touch.ey=touch.y}}
+if(keyHeld&&time-keyEmit>=1/waveRate){addWave(W*.5,H*.4,.8);keyEmit=time}
+while(waves.length&&time-waves[0].born>3.8)waves.shift();
+const n=Math.max(1,Math.ceil(dt/.008)),h=dt/n;
+for(const p of letters){let ox=0,oy=0;
+for(const wave of waves){const dx=p.hx-wave.x,dy=p.hy-wave.y,d=Math.hypot(dx,dy),age=time-wave.born,delta=d-age*250*wave.size;if(Math.abs(delta)>170*wave.size||d<.001)continue;
+const fade=Math.exp(-age*.62)/Math.sqrt(1+age*1.5),envelope=Math.exp(-delta*delta/(2*55*55*wave.size*wave.size));
+const push=38*Math.sqrt(wave.size)*wave.strength*envelope*Math.sin(delta*.075/wave.size)*fade*Math.min(1,age*12)*d/(d+14);
+ox+=dx/d*push;oy+=dy/d*push}
+// Long, coherent traveling waves make the whole image undulate like it is underwater.
+// Ease out at the paper edges to keep glyphs inside the canvas.
+const edge=clamp(Math.min(p.hx,W-p.hx,p.hy,H-p.hy)/80,0,1),flow=ambientBlend*swayCurrent*edge;
+const driftX=flow*(.76*Math.sin(time*.82+p.hy*.008)+.24*Math.sin(time*.43+p.hx*.005+p.hy*.003));
+const driftY=flow*(.62*Math.sin(time*.67+p.hx*.007)+.22*Math.cos(time*.39+p.hy*.009));
+const magnitude=Math.hypot(ox,oy),scale=magnitude>34?34/magnitude:1,tx=p.hx+ox*scale+driftX,ty=p.hy+oy*scale+driftY;
+for(let j=0;j<n;j++){p.vx+=((tx-p.x)*210-p.vx*20)*h;p.vy+=((ty-p.y)*210-p.vy*20)*h;p.x+=p.vx*h;p.y+=p.vy*h}}}
+function render(){ctx.fillStyle='#fafaf7';ctx.fillRect(0,0,W,H);for(const p of letters)ctx.drawImage(atlasPages[p.page].sheet,p.sx,p.sy,cellW,cellH,p.x-cellW/2,p.y-cellH/2,cellW,cellH)}
+function tick(stamp){const dt=last?clamp((stamp-last)/1000,.001,.04):1/60;last=stamp;step(dt);render();requestAnimationFrame(tick)}
+function position(e){const r=canvas.getBoundingClientRect();return {x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height}}
+canvas.addEventListener('pointerdown',e=>{if(!ready||(e.pointerType==='mouse'&&e.button!==0))return;e.preventDefault();stopDemo();canvas.setPointerCapture(e.pointerId);const p=position(e);touches.set(e.pointerId,{...p,ex:p.x,ey:p.y,emitted:time});addWave(p.x,p.y);status.textContent='随意点按或拖动，让涟漪相遇'});
+canvas.addEventListener('pointermove',e=>{const touch=touches.get(e.pointerId);if(!touch)return;const p=position(e);touch.x=p.x;touch.y=p.y;if(time-touch.emitted>=1/waveRate&&Math.hypot(p.x-touch.ex,p.y-touch.ey)>15){addWave(p.x,p.y,.72);touch.emitted=time;touch.ex=p.x;touch.ey=p.y}});
+function release(e){touches.delete(e.pointerId);if(!touches.size)status.textContent='涟漪正在慢慢平息'}
+canvas.addEventListener('pointerup',release);canvas.addEventListener('pointercancel',release);canvas.addEventListener('lostpointercapture',release);
+function cancelTouches(){touches.clear();keyHeld=false}
+window.addEventListener('blur',cancelTouches);canvas.addEventListener('blur',()=>{keyHeld=false});document.addEventListener('visibilitychange',()=>{last=0;if(document.hidden)cancelTouches()});
+document.getElementById('demo').onclick=()=>{if(auto){stopDemo();status.textContent='演示已停止，涟漪正在平息'}else{cancelTouches();auto=true;nextDemo=time;demoIndex=0;document.getElementById('demo').setAttribute('aria-pressed','true');document.getElementById('demo').textContent='停止演示';status.textContent='演示中：水波扩散，相遇，然后平息'}};
+document.getElementById('reset').onclick=reset;
+document.getElementById('sway').addEventListener('input',e=>{swayAmount=Number(e.target.value);document.getElementById('sway-value').textContent=swayAmount+' px';if(swayAmount>0&&!ambient){ambient=true;motionLabel()}});
+function motionLabel(){document.getElementById('motion').setAttribute('aria-pressed',String(ambient));document.getElementById('motion').textContent=ambient?'水中摇晃：开':'水中摇晃：关'}
+document.getElementById('motion').onclick=()=>{ambient=!ambient;motionLabel();status.textContent=ambient?'画面随水流缓慢起伏，颜色仍来自原图。':'已关闭摇晃，水波平息后保持静止。'};motionLabel();
+document.getElementById('save').onclick=()=>{render();canvas.toBlob(blob=>{if(!blob){status.textContent='保存失败，请重试';return}const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='paper-ripples.png';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);status.textContent='画面已导出为 PNG'},'image/png')};
+document.getElementById('full').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else if(stage.requestFullscreen)await stage.requestFullscreen();else status.textContent='此浏览器不支持全屏，可横屏观看'}catch(e){status.textContent='无法进入全屏，请直接在当前窗口体验'}};
+canvas.addEventListener('keydown',e=>{if(!ready)return;if(e.code==='Space'){e.preventDefault();if(!e.repeat){stopDemo();keyHeld=true;keyEmit=time;addWave(W*.5,H*.4)}}else if(e.key.toLowerCase()==='r')reset()});canvas.addEventListener('keyup',e=>{if(e.code==='Space'){e.preventDefault();keyHeld=false}});
+
+setButtons(false);render();requestAnimationFrame(tick);
+</script></body></html>
